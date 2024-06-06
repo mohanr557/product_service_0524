@@ -7,6 +7,7 @@ import in.mohan.product_service_0524.exceptions.ProductNotFoundException;
 import in.mohan.product_service_0524.models.Product;
 import in.mohan.product_service_0524.services.ProductService;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,8 @@ public class ProductController {
     private ProductService productService;
     private ModelMapper modelMapper;
 
-    public ProductController(ProductService productService,
+    public ProductController(@Qualifier("selfProductService")
+                             ProductService productService,
                              ModelMapper modelMapper) {
         this.productService = productService;
         this.modelMapper = modelMapper;
