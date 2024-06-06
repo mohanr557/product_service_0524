@@ -6,6 +6,7 @@ import in.mohan.product_service_0524.exceptions.ProductNotFoundException;
 import in.mohan.product_service_0524.models.Product;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -81,13 +82,20 @@ public class FakeStoreProductService implements ProductService {
     }
 
     public Product deleteProduct(Long productId) throws ProductNotFoundException {
-        FakeStoreDto fakeStoreDto = restTemplate.exchange(
+        ResponseEntity<FakeStoreDto> responseEntity = restTemplate.exchange(
                 "http://fakestoreapi.com/products/" + productId,
                 HttpMethod.DELETE,
                 null,
                 FakeStoreDto.class
-        ).getBody();
+        );
+//        FakeStoreDto fakeStoreDto = restTemplate.exchange(
+//                "http://fakestoreapi.com/products/" + productId,
+//                HttpMethod.DELETE,
+//                null,
+//                FakeStoreDto.class
+//        ).getBody();
 
+        FakeStoreDto fakeStoreDto = responseEntity.getBody();
         if (fakeStoreDto == null) {
             throw new ProductNotFoundException(
                     "Product with id " + productId + " not found"
