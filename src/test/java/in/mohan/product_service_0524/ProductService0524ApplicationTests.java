@@ -1,15 +1,18 @@
 package in.mohan.product_service_0524;
 
+import in.mohan.product_service_0524.models.Category;
 import in.mohan.product_service_0524.models.Product;
 import in.mohan.product_service_0524.repositories.CategoryRepository;
 import in.mohan.product_service_0524.repositories.ProductRepository;
 import in.mohan.product_service_0524.repositories.projections.ProductProjection;
 import in.mohan.product_service_0524.repositories.projections.ProductWithIdAndTitle;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
+import java.util.Optional;
 
 @SpringBootTest
 class ProductService0524ApplicationTests {
@@ -81,6 +84,32 @@ class ProductService0524ApplicationTests {
         ProductProjection product2 = productRepository.someNativeSql2(5L);
         System.out.println(product2.getTitle());
         System.out.println(product2.getId());
+    }
+
+    @Test
+    @Transactional
+    void testFetchType() {
+        Optional<Category> category = categoryRepository.findById(3L);
+        if (category.isPresent()) {
+            System.out.println(category.get().getTitle());
+            List<Product> products = category.get().getProducts();
+            for (Product product : products) {
+                System.out.println(product.getTitle());
+            }
+        }
+    }
+
+    @Test
+    @Transactional
+    void testFetchMode() {
+        List<Category> categories = categoryRepository.findByTitleEndingWith("electronics");
+        for (Category category : categories) {
+            System.out.println(category.getTitle());
+            List<Product> products = category.getProducts();
+            for (Product product : products) {
+                System.out.println(product.getTitle());
+            }
+        }
     }
 
 
