@@ -5,6 +5,7 @@ import in.mohan.product_service_0524.dtos.ProductResponseDto;
 import in.mohan.product_service_0524.exceptions.ProductNotFoundException;
 import in.mohan.product_service_0524.models.Product;
 import org.springframework.data.domain.Page;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -17,14 +18,29 @@ import java.util.List;
 @Service("fakeStoreProductService")
 public class FakeStoreProductService implements ProductService {
 
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
+    private final RedisTemplate redisTemplate;
 
-    public FakeStoreProductService(RestTemplate restTemplate) {
+    public FakeStoreProductService(RestTemplate restTemplate, RedisTemplate redisTemplate) {
         this.restTemplate = restTemplate;
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
     public Product getSingleProduct(Long productId) throws ProductNotFoundException {
+
+        // Check in Cache
+        Product productInCache = (Product) redisTemplate.opsForHash().
+                get("PRODUCTS", "PRODUCT_" + productId);
+
+        if (productInCache != null) {
+            // Cache Hit
+            System.out.println("Cache hit for product " + productId);
+            return productInCache;
+        }
+
+        // Cache miss
+        System.out.println("Cache miss for product " + productId);
 
         FakeStoreDto fakeStoreDto = restTemplate.getForObject(
                 "https://fakestoreapi.com/products/" + productId,
@@ -38,7 +54,9 @@ public class FakeStoreProductService implements ProductService {
                             +" try a product with id less than 21");
         }
 
-        return fakeStoreDto.toProduct();
+        Product fakeStoreProduct =  fakeStoreDto.toProduct();
+        redisTemplate.opsForHash().put("PRODUCTS", "PRODUCT_" + productId, fakeStoreProduct);
+        return fakeStoreProduct;
     }
 
     @Override

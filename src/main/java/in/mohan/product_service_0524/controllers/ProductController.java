@@ -9,6 +9,7 @@ import in.mohan.product_service_0524.services.ProductService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,10 +18,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@RequestMapping("/products")
 public class ProductController {
 
     private ProductService productService;
     private ModelMapper modelMapper;
+
+
 
     public ProductController(@Qualifier("selfProductService")
                              ProductService productService,
@@ -30,7 +34,7 @@ public class ProductController {
     }
 
     // e.g: localhost:8080/products/5
-    @GetMapping("/products/{id}")
+    @GetMapping("{id}")
     public ProductResponseDto getProductDetails (@PathVariable("id") Long productId)
     throws ProductNotFoundException {
         Product product =  productService.getSingleProduct(productId);
@@ -49,7 +53,7 @@ public class ProductController {
 //    }
 
 
-    @GetMapping("/products")
+    @GetMapping()
     public ResponseEntity<List<ProductResponseDto>> getAllProducts(
             @RequestParam("pageNumber") int pageNumber,
             @RequestParam("pageSize") int pageSize,
@@ -63,7 +67,7 @@ public class ProductController {
 
 
 
-    @PostMapping("/products")
+    @PostMapping()
     public ResponseEntity <ProductResponseDto> createNewProduct(@RequestBody ProductRequestDto productRequestDto) {
         Product product =  productService.addProduct(
                 productRequestDto.getTitle(),
@@ -77,7 +81,7 @@ public class ProductController {
         return new ResponseEntity<>(productResponseDto, HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/products/{id}")
+    @DeleteMapping("{id}")
     public ResponseEntity<ProductResponseDto> deleteProduct(@PathVariable("id") Long productId)
             throws ProductNotFoundException {
         Product product = productService.deleteProduct(productId);
@@ -85,7 +89,7 @@ public class ProductController {
         return new ResponseEntity<>(productResponseDto, HttpStatus.OK);
     }
 
-    @PatchMapping("/products/{id}")
+    @PatchMapping("{id}")
     public ResponseEntity<ProductResponseDto> updateProduct(@PathVariable("id") Long productId,
                                                             @RequestBody ProductRequestDto productRequestDto)
             throws ProductNotFoundException {
@@ -100,7 +104,7 @@ public class ProductController {
     }
 
 
-    @PutMapping("/products/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<ProductResponseDto> replaceProduct(@PathVariable("id") Long productId,
                                                              @RequestBody ProductRequestDto productRequestDto)
             throws ProductNotFoundException {
