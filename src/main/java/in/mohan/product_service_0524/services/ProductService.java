@@ -4,6 +4,7 @@ import in.mohan.product_service_0524.dtos.FakeStoreDto;
 import in.mohan.product_service_0524.dtos.ProductResponseDto;
 import in.mohan.product_service_0524.exceptions.ProductNotFoundException;
 import in.mohan.product_service_0524.models.Product;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ public interface ProductService {
 
     public Product getSingleProduct(Long productId) throws ProductNotFoundException;
     public List<Product> getAllProducts();
+    public Page<Product> getAllProducts(int pageNumber, int pageSize,String SortParam);
     public Product addProduct(
             String title,
             String description,
